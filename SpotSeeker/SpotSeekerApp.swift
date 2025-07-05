@@ -2,7 +2,7 @@
 //  SpotSeekerApp.swift
 //  SpotSeeker
 //
-//  Created by ByteDance on 7/5/25.
+//  Created by Wenhao.Wang on 7/5/25.
 //
 
 import SwiftUI
