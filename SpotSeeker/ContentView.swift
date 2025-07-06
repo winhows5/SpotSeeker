@@ -12,7 +12,9 @@ struct ContentView: View {
     @State private var capturedImage: UIImage?
     @State private var overlayImage: UIImage?
     @State private var isImagePickerPresented = false
-    @State private var isCameraPresented = false
+    @State private var takePicture = false
+    @State private var showingSaveAlert = false
+    @State private var saveMessage = ""
 
     var body: some View {
         VStack {
@@ -21,13 +23,29 @@ struct ContentView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                Button("Take Another Photo") {
-                    self.capturedImage = nil
+                HStack {
+                    Button("Take Another Photo") {
+                        self.capturedImage = nil
+                    }
+                    .padding()
+
+                    Button("Save Photo") {
+                        let imageSaver = ImageSaver()
+                        imageSaver.save(image: capturedImage) { result in
+                            switch result {
+                            case .success:
+                                self.saveMessage = "Photo saved!"
+                            case .failure(let error):
+                                self.saveMessage = "Error saving: \(error.localizedDescription)"
+                            }
+                            self.showingSaveAlert = true
+                        }
+                    }
+                    .padding()
                 }
-                .padding()
             } else {
                 ZStack {
-                    CameraView(capturedImage: $capturedImage)
+                    CameraView(capturedImage: $capturedImage, takePicture: $takePicture)
                         .edgesIgnoringSafeArea(.all)
 
                     if let overlayImage = overlayImage {
@@ -44,10 +62,36 @@ struct ContentView: View {
                     isImagePickerPresented = true
                 }
                 .padding()
+
+                Button("Capture") {
+                    self.takePicture = true
+                }
+                .padding()
+
                 .sheet(isPresented: $isImagePickerPresented) {
                     PhotoPicker(selectedImage: $overlayImage)
                 }
             }
+        }
+        .alert(isPresented: $showingSaveAlert) {
+            Alert(title: Text("Save Status"), message: Text(saveMessage), dismissButton: .default(Text("OK")))
+        }
+    }
+}
+
+class ImageSaver: NSObject {
+    private var completionHandler: ((Result<Void, Error>) -> Void)?
+
+    func save(image: UIImage, completionHandler: @escaping (Result<Void, Error>) -> Void) {
+        self.completionHandler = completionHandler
+        UIImageWriteToSavedPhotosAlbum(image, self, #selector(saveCompleted), nil)
+    }
+
+    @objc func saveCompleted(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeRawPointer) {
+        if let error = error {
+            completionHandler?(.failure(error))
+        } else {
+            completionHandler?(.success(()))
         }
     }
 }

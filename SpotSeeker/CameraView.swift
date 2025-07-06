@@ -10,6 +10,7 @@ import AVFoundation
 
 struct CameraView: UIViewControllerRepresentable {
     @Binding var capturedImage: UIImage?
+    @Binding var takePicture: Bool
 
     func makeUIViewController(context: Context) -> CameraViewController {
         let cameraViewController = CameraViewController()
@@ -17,7 +18,14 @@ struct CameraView: UIViewControllerRepresentable {
         return cameraViewController
     }
 
-    func updateUIViewController(_ uiViewController: CameraViewController, context: Context) {}
+    func updateUIViewController(_ uiViewController: CameraViewController, context: Context) {
+        if self.takePicture {
+            uiViewController.capturePhoto()
+            DispatchQueue.main.async {
+                self.takePicture = false
+            }
+        }
+    }
 
     func makeCoordinator() -> Coordinator {
         Coordinator(self)

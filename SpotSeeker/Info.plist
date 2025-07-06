@@ -4,13 +4,15 @@
 <dict>
 	<key>NSCameraUsageDescription</key>
 	<string>This app needs access to your camera to take photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>This app needs access to your photo library to select overlay images.</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.example.PhotoTaker</string>
+	<string>com.ideabase.SpotSeeker</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 	<key>CFBundleExecutable</key>
-	<string>PhotoTaker</string>
+	<string>SpotSeeker</string>
 	<key>CFBundleName</key>
-	<string>PhotoTaker</string>
+	<string>SpotSeeker</string>
 </dict>
 </plist>

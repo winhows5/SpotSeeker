@@ -21,7 +21,6 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupCamera()
-        setupCaptureButton()
     }
 
     func setupCamera() {
@@ -60,15 +59,6 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
                 self.previewLayer.frame = self.view.bounds
             }
         }
-    }
-
-    func setupCaptureButton() {
-        let button = UIButton(type: .system)
-        button.setTitle("Capture", for: .normal)
-        button.frame = CGRect(x: 0, y: 0, width: 100, height: 50)
-        button.center = CGPoint(x: view.center.x, y: view.bounds.height - 80)
-        button.addTarget(self, action: #selector(capturePhoto), for: .touchUpInside)
-        view.addSubview(button)
     }
 
     @objc func capturePhoto() {

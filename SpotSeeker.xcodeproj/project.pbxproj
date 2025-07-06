@@ -11,9 +11,8 @@
 		2BD6B04A2E19E95000220C1B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0492E19E95000220C1B /* ContentView.swift */; };
 		2BD6B04C2E19E95100220C1B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2BD6B04B2E19E95100220C1B /* Assets.xcassets */; };
 		2BD6B04F2E19E95100220C1B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2BD6B04E2E19E95100220C1B /* Preview Assets.xcassets */; };
-		2BD6B0592E19E95100220C1B /* SpotSeekerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0582E19E95100220C1B /* SpotSeekerTests.swift */; };
-		2BD6B0632E19E95100220C1B /* SpotSeekerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0622E19E95100220C1B /* SpotSeekerUITests.swift */; };
-		2BD6B0652E19E95100220C1B /* SpotSeekerUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0642E19E95100220C1B /* SpotSeekerUITestsLaunchTests.swift */; };
+		2BD6B0722E19EC2C00220C1B /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0712E19EC2C00220C1B /* CameraView.swift */; };
+		2BD6B0762E19ECEE00220C1B /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0752E19ECEE00220C1B /* CameraViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,10 +39,10 @@
 		2BD6B04B2E19E95100220C1B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2BD6B04E2E19E95100220C1B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2BD6B0542E19E95100220C1B /* SpotSeekerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpotSeekerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2BD6B0582E19E95100220C1B /* SpotSeekerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotSeekerTests.swift; sourceTree = "<group>"; };
 		2BD6B05E2E19E95100220C1B /* SpotSeekerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpotSeekerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		2BD6B0622E19E95100220C1B /* SpotSeekerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotSeekerUITests.swift; sourceTree = "<group>"; };
-		2BD6B0642E19E95100220C1B /* SpotSeekerUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotSeekerUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		2BD6B0712E19EC2C00220C1B /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		2BD6B0732E19EC8000220C1B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2BD6B0752E19ECEE00220C1B /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,8 +74,6 @@
 			isa = PBXGroup;
 			children = (
 				2BD6B0462E19E95000220C1B /* SpotSeeker */,
-				2BD6B0572E19E95100220C1B /* SpotSeekerTests */,
-				2BD6B0612E19E95100220C1B /* SpotSeekerUITests */,
 				2BD6B0452E19E95000220C1B /* Products */,
 			);
 			sourceTree = "<group>";
@@ -95,9 +92,12 @@
 			isa = PBXGroup;
 			children = (
 				2BD6B0472E19E95000220C1B /* SpotSeekerApp.swift */,
+				2BD6B0712E19EC2C00220C1B /* CameraView.swift */,
 				2BD6B0492E19E95000220C1B /* ContentView.swift */,
+				2BD6B0732E19EC8000220C1B /* Info.plist */,
 				2BD6B04B2E19E95100220C1B /* Assets.xcassets */,
 				2BD6B04D2E19E95100220C1B /* Preview Content */,
+				2BD6B0752E19ECEE00220C1B /* CameraViewController.swift */,
 			);
 			path = SpotSeeker;
 			sourceTree = "<group>";
@@ -108,23 +108,6 @@
 				2BD6B04E2E19E95100220C1B /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
-			sourceTree = "<group>";
-		};
-		2BD6B0572E19E95100220C1B /* SpotSeekerTests */ = {
-			isa = PBXGroup;
-			children = (
-				2BD6B0582E19E95100220C1B /* SpotSeekerTests.swift */,
-			);
-			path = SpotSeekerTests;
-			sourceTree = "<group>";
-		};
-		2BD6B0612E19E95100220C1B /* SpotSeekerUITests */ = {
-			isa = PBXGroup;
-			children = (
-				2BD6B0622E19E95100220C1B /* SpotSeekerUITests.swift */,
-				2BD6B0642E19E95100220C1B /* SpotSeekerUITestsLaunchTests.swift */,
-			);
-			path = SpotSeekerUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -257,6 +240,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2BD6B0722E19EC2C00220C1B /* CameraView.swift in Sources */,
+				2BD6B0762E19ECEE00220C1B /* CameraViewController.swift in Sources */,
 				2BD6B04A2E19E95000220C1B /* ContentView.swift in Sources */,
 				2BD6B0482E19E95000220C1B /* SpotSeekerApp.swift in Sources */,
 			);
@@ -266,7 +251,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2BD6B0592E19E95100220C1B /* SpotSeekerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -274,8 +258,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				2BD6B0632E19E95100220C1B /* SpotSeekerUITests.swift in Sources */,
-				2BD6B0652E19E95100220C1B /* SpotSeekerUITestsLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,7 +327,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -399,7 +381,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -417,8 +399,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SpotSeeker/Preview Content\"";
+				DEVELOPMENT_TEAM = CVUAZCKP7T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SpotSeekerBundle;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to your camera to take photos.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to your photo library to select overlay images.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -445,8 +431,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SpotSeeker/Preview Content\"";
+				DEVELOPMENT_TEAM = CVUAZCKP7T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = SpotSeekerBundle;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to your camera to take photos.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to your photo library to select overlay images.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
