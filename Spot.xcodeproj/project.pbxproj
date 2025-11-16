@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2B3FD29C2EC9859D0031D35F /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3FD29B2EC9859D0031D35F /* SplashView.swift */; };
 		2BD6B0482E19E95000220C1B /* SpotSeekerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0472E19E95000220C1B /* SpotSeekerApp.swift */; };
 		2BD6B04A2E19E95000220C1B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0492E19E95000220C1B /* ContentView.swift */; };
 		2BD6B04C2E19E95100220C1B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2BD6B04B2E19E95100220C1B /* Assets.xcassets */; };
@@ -33,6 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2B3FD29B2EC9859D0031D35F /* SplashView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
 		2BD6B0442E19E95000220C1B /* SpotSeeker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpotSeeker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BD6B0472E19E95000220C1B /* SpotSeekerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotSeekerApp.swift; sourceTree = "<group>"; };
 		2BD6B0492E19E95000220C1B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -91,6 +93,7 @@
 		2BD6B0462E19E95000220C1B /* SpotSeeker */ = {
 			isa = PBXGroup;
 			children = (
+				2B3FD29B2EC9859D0031D35F /* SplashView.swift */,
 				2BD6B0472E19E95000220C1B /* SpotSeekerApp.swift */,
 				2BD6B0712E19EC2C00220C1B /* CameraView.swift */,
 				2BD6B0492E19E95000220C1B /* ContentView.swift */,
@@ -189,7 +192,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 2BD6B03F2E19E95000220C1B /* Build configuration list for PBXProject "SpotSeeker" */;
+			buildConfigurationList = 2BD6B03F2E19E95000220C1B /* Build configuration list for PBXProject "Spot" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -242,6 +245,7 @@
 			files = (
 				2BD6B0722E19EC2C00220C1B /* CameraView.swift in Sources */,
 				2BD6B0762E19ECEE00220C1B /* CameraViewController.swift in Sources */,
+				2B3FD29C2EC9859D0031D35F /* SplashView.swift in Sources */,
 				2BD6B04A2E19E95000220C1B /* ContentView.swift in Sources */,
 				2BD6B0482E19E95000220C1B /* SpotSeekerApp.swift in Sources */,
 			);
@@ -530,7 +534,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2BD6B03F2E19E95000220C1B /* Build configuration list for PBXProject "SpotSeeker" */ = {
+		2BD6B03F2E19E95000220C1B /* Build configuration list for PBXProject "Spot" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2BD6B0662E19E95100220C1B /* Debug */,
