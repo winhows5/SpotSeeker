@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2B3FD29C2EC9859D0031D35F /* SplashView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3FD29B2EC9859D0031D35F /* SplashView.swift */; };
+		2B3FD29E2EC98FA80031D35F /* ImageSeriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3FD29D2EC98FA80031D35F /* ImageSeriesView.swift */; };
+		2B3FD2A02EC98FB20031D35F /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B3FD29F2EC98FB20031D35F /* ProfileView.swift */; };
 		2BD6B0482E19E95000220C1B /* SpotSeekerApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0472E19E95000220C1B /* SpotSeekerApp.swift */; };
 		2BD6B04A2E19E95000220C1B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0492E19E95000220C1B /* ContentView.swift */; };
 		2BD6B04C2E19E95100220C1B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2BD6B04B2E19E95100220C1B /* Assets.xcassets */; };
@@ -35,6 +37,8 @@
 
 /* Begin PBXFileReference section */
 		2B3FD29B2EC9859D0031D35F /* SplashView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SplashView.swift; sourceTree = "<group>"; };
+		2B3FD29D2EC98FA80031D35F /* ImageSeriesView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageSeriesView.swift; sourceTree = "<group>"; };
+		2B3FD29F2EC98FB20031D35F /* ProfileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		2BD6B0442E19E95000220C1B /* SpotSeeker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SpotSeeker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2BD6B0472E19E95000220C1B /* SpotSeekerApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotSeekerApp.swift; sourceTree = "<group>"; };
 		2BD6B0492E19E95000220C1B /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -93,6 +97,8 @@
 		2BD6B0462E19E95000220C1B /* SpotSeeker */ = {
 			isa = PBXGroup;
 			children = (
+				2B3FD29F2EC98FB20031D35F /* ProfileView.swift */,
+				2B3FD29D2EC98FA80031D35F /* ImageSeriesView.swift */,
 				2B3FD29B2EC9859D0031D35F /* SplashView.swift */,
 				2BD6B0472E19E95000220C1B /* SpotSeekerApp.swift */,
 				2BD6B0712E19EC2C00220C1B /* CameraView.swift */,
@@ -192,7 +198,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 2BD6B03F2E19E95000220C1B /* Build configuration list for PBXProject "Spot" */;
+			buildConfigurationList = 2BD6B03F2E19E95000220C1B /* Build configuration list for PBXProject "SpotSeeker" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -248,6 +254,8 @@
 				2B3FD29C2EC9859D0031D35F /* SplashView.swift in Sources */,
 				2BD6B04A2E19E95000220C1B /* ContentView.swift in Sources */,
 				2BD6B0482E19E95000220C1B /* SpotSeekerApp.swift in Sources */,
+				2B3FD2A02EC98FB20031D35F /* ProfileView.swift in Sources */,
+				2B3FD29E2EC98FA80031D35F /* ImageSeriesView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -406,7 +414,8 @@
 				DEVELOPMENT_TEAM = CVUAZCKP7T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = SpotSeekerBundle;
+				INFOPLIST_KEY_CFBundleDisplayName = SpotSeeker;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to your camera to take photos.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to your photo library to select overlay images.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -438,7 +447,8 @@
 				DEVELOPMENT_TEAM = CVUAZCKP7T;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = SpotSeekerBundle;
+				INFOPLIST_KEY_CFBundleDisplayName = SpotSeeker;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.photography";
 				INFOPLIST_KEY_NSCameraUsageDescription = "This app needs access to your camera to take photos.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "This app needs access to your photo library to select overlay images.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -534,7 +544,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		2BD6B03F2E19E95000220C1B /* Build configuration list for PBXProject "Spot" */ = {
+		2BD6B03F2E19E95000220C1B /* Build configuration list for PBXProject "SpotSeeker" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				2BD6B0662E19E95100220C1B /* Debug */,
