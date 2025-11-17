@@ -16,6 +16,14 @@
 		2BD6B04F2E19E95100220C1B /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2BD6B04E2E19E95100220C1B /* Preview Assets.xcassets */; };
 		2BD6B0722E19EC2C00220C1B /* CameraView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0712E19EC2C00220C1B /* CameraView.swift */; };
 		2BD6B0762E19ECEE00220C1B /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BD6B0752E19ECEE00220C1B /* CameraViewController.swift */; };
+		ABF0B0020000000000000001 /* bell.svg in Resources */ = {isa = PBXBuildFile; fileRef = ABF0B0010000000000000001 /* bell.svg */; };
+		ABF0B0020000000000000002 /* bolt.svg in Resources */ = {isa = PBXBuildFile; fileRef = ABF0B0010000000000000002 /* bolt.svg */; };
+		ABF0B0020000000000000003 /* camera.svg in Resources */ = {isa = PBXBuildFile; fileRef = ABF0B0010000000000000003 /* camera.svg */; };
+		ABF0B0020000000000000004 /* heart.svg in Resources */ = {isa = PBXBuildFile; fileRef = ABF0B0010000000000000004 /* heart.svg */; };
+		ABF0B0020000000000000005 /* leaf.svg in Resources */ = {isa = PBXBuildFile; fileRef = ABF0B0010000000000000005 /* leaf.svg */; };
+		ABF0B0020000000000000006 /* person.svg in Resources */ = {isa = PBXBuildFile; fileRef = ABF0B0010000000000000006 /* person.svg */; };
+		ABF0B0020000000000000007 /* photo.svg in Resources */ = {isa = PBXBuildFile; fileRef = ABF0B0010000000000000007 /* photo.svg */; };
+		ABF0B0020000000000000008 /* star.svg in Resources */ = {isa = PBXBuildFile; fileRef = ABF0B0010000000000000008 /* star.svg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +57,14 @@
 		2BD6B0712E19EC2C00220C1B /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
 		2BD6B0732E19EC8000220C1B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2BD6B0752E19ECEE00220C1B /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
+		ABF0B0010000000000000001 /* bell.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = bell.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000002 /* bolt.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = bolt.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000003 /* camera.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = camera.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000004 /* heart.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = heart.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000005 /* leaf.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = leaf.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000006 /* person.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = person.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000007 /* photo.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = photo.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000008 /* star.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = star.svg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -109,6 +125,97 @@
 				2BD6B0752E19ECEE00220C1B /* CameraViewController.swift */,
 			);
 			path = SpotSeeker;
+			sourceTree = "<group>";
+		};
+		2BD6B04D2E19E95100220C1B /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				2BD6B04E2E19E95100220C1B /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		2BD6B0422E19E95000220C1B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2BD6B04F2E19E95100220C1B /* Preview Assets.xcassets in Resources */,
+				2BD6B04C2E19E95100220C1B /* Assets.xcassets in Resources */,
+				ABF0B0020000000000000001 /* bell.svg in Resources */,
+				ABF0B0020000000000000002 /* bolt.svg in Resources */,
+				ABF0B0020000000000000003 /* camera.svg in Resources */,
+				ABF0B0020000000000000004 /* heart.svg in Resources */,
+				ABF0B0020000000000000005 /* leaf.svg in Resources */,
+				ABF0B0020000000000000006 /* person.svg in Resources */,
+				ABF0B0020000000000000007 /* photo.svg in Resources */,
+				ABF0B0020000000000000008 /* star.svg in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2BD6B0522E19E95100220C1B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2BD6B05C2E19E95100220C1B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2BD6B04B2E19E95100220C1B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2BD6B04E2E19E95100220C1B /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		2BD6B0542E19E95100220C1B /* SpotSeekerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpotSeekerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2BD6B05E2E19E95100220C1B /* SpotSeekerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SpotSeekerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		2BD6B0712E19EC2C00220C1B /* CameraView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraView.swift; sourceTree = "<group>"; };
+		2BD6B0732E19EC8000220C1B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2BD6B0752E19ECEE00220C1B /* CameraViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraViewController.swift; sourceTree = "<group>"; };
+		ABF0B0010000000000000001 /* bell.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = bell.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000002 /* bolt.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = bolt.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000003 /* camera.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = camera.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000004 /* heart.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = heart.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000005 /* leaf.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = leaf.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000006 /* person.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = person.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000007 /* photo.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = photo.svg; sourceTree = "<group>"; };
+		ABF0B0010000000000000008 /* star.svg */ = {isa = PBXFileReference; lastKnownFileType = image.svg; path = star.svg; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+
+
+/* Begin PBXGroup section */
+		2BD6B0432E19E95000220C1B /* SpotSeeker */ = {
+			isa = PBXGroup;
+			children = (
+				2BD6B04B2E19E95100220C1B /* Assets.xcassets */,
+				ABF0B0030000000000000001 /* ImageSeries */,
+			);
+			path = SpotSeeker;
+			sourceTree = "<group>";
+		};
+		2BD6B0432E19E95000220C1B /* DemoSeries */ = {
+			isa = PBXGroup;
+			children = (
+				ABF0B0030000000000000002 /* DemoSeries */,
+			);
+			path = ImageSeries;
+			sourceTree = "<group>";
+		};
+		2BD6B0432E19E95000220C1B /* DemoSeries */ = {
+			isa = PBXGroup;
+			children = (
+				ABF0B0010000000000000001 /* bell.svg */,
+				ABF0B0010000000000000002 /* bolt.svg */,
+				ABF0B0010000000000000003 /* camera.svg */,
+				ABF0B0010000000000000004 /* heart.svg */,
+				ABF0B0010000000000000005 /* leaf.svg */,
+				ABF0B0010000000000000006 /* person.svg */,
+				ABF0B0010000000000000007 /* photo.svg */,
+				ABF0B0010000000000000008 /* star.svg */,
+			);
+			path = DemoSeries;
 			sourceTree = "<group>";
 		};
 		2BD6B04D2E19E95100220C1B /* Preview Content */ = {
