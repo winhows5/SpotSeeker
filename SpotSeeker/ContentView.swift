@@ -96,33 +96,31 @@ struct ContentView: View {
                     VStack {
                         Spacer()
 
-                        HStack(alignment: .center, spacing: 16) {
-                            // Left: overlay picker icon button (no text)
-                            Button {
-                                isImagePickerPresented = true
-                            } label: {
-                                Image(systemName: "photo")
-                                    .font(.system(size: 22, weight: .regular))
-                                    .foregroundColor(.white)
-                                    .padding(12)
-                            }
-
-                            Spacer()
-
-                            // Center: circular shutter button (empty circle)
-                            ShutterButton {
-                                self.takePicture = true
-                            }
-
-                            Spacer()
-
-                            // Right: templates strip at the same height as shutter
+                        ZStack {
+                            // Full-width strip behind the centered shutter
                             TemplateStrip(items: templates, selectedId: selectedTemplateId) { item in
                                 selectedTemplateId = item.id
                                 overlayImage = nil
                             }
                             .frame(height: 60)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(maxWidth: .infinity)
+                            .offset(y: -80)
+
+                            // Centered shutter always on top
+                            ShutterButton(action: { self.takePicture = true }, assetName: selectedTemplateId.flatMap { id in templates.first(where: { $0.id == id })?.assetName })
+
+                            // Left overlay picker pinned to leading edge
+                            HStack {
+                                Button {
+                                    isImagePickerPresented = true
+                                } label: {
+                                    Image(systemName: "photo")
+                                        .font(.system(size: 22, weight: .regular))
+                                        .foregroundColor(.white)
+                                        .padding(12)
+                                }
+                                Spacer()
+                            }
                         }
                         .padding(.horizontal, 16)
                         .padding(.bottom, 24)
@@ -300,6 +298,7 @@ svg { width: 80vw; height: auto; }
         webView.backgroundColor = .clear
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.isUserInteractionEnabled = false
         let svgString: String?
         if let persisted = persistedSVGString(for: assetName) {
@@ -366,6 +365,7 @@ svg { width: 52px; height: 52px; }
         webView.backgroundColor = .clear
         webView.scrollView.isScrollEnabled = false
         webView.scrollView.bounces = false
+        webView.scrollView.contentInsetAdjustmentBehavior = .never
         webView.isUserInteractionEnabled = false
         let svgString: String?
         if let persisted = persistedSVGString(for: assetName) {
@@ -396,49 +396,128 @@ struct TemplateStrip: View {
     let items: [TemplateItem]
     let selectedId: Int?
     let onSelect: (TemplateItem) -> Void
+    struct CenterPrefKey: PreferenceKey {
+        static var defaultValue: [String: CGFloat] = [:]
+        static func reduce(value: inout [String: CGFloat], nextValue: () -> [String: CGFloat]) {
+            value.merge(nextValue(), uniquingKeysWith: { $1 })
+        }
+    }
+    @State private var centers: [String: CGFloat] = [:]
+    @GestureState private var isDragging = false
+    @State private var lastSnappedKey: String? = nil
 
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                ForEach(items) { item in
-                    Button {
-                        onSelect(item)
-                    } label: {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 12)
-                                .fill(Color.white.opacity(selectedId == item.id ? 0.15 : 0.08))
-                                .frame(width: 60, height: 60)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color.white.opacity(0.9), lineWidth: selectedId == item.id ? 3 : 1)
-                                )
-
-                            SVGTemplateView(assetName: item.assetName)
-                                .frame(width: 60, height: 60)
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .allowsHitTesting(false)
+        ScrollViewReader { proxy in
+            let loops = 5
+            let middle = loops / 2
+            let repeatedCount = loops * items.count
+            GeometryReader { containerGeo in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 40) {
+                        ForEach(0..<repeatedCount, id: \.self) { idx in
+                            let loop = idx / items.count
+                            let item = items[idx % items.count]
+                            Button {
+                                onSelect(item)
+                                withAnimation(.easeInOut) {
+                                    let targetId = "\(middle)-\(item.id)"
+                                    proxy.scrollTo(targetId, anchor: .center)
+                                }
+                            } label: {
+                                ZStack {
+                                    SVGTemplateView(assetName: item.assetName)
+                                        .frame(width: 60, height: 60)
+                                        .allowsHitTesting(false)
+                                }
+                            }
+                            .background(GeometryReader { gp in
+                                Color.clear.preference(key: CenterPrefKey.self, value: ["\(loop)-\(item.id)": gp.frame(in: .named("stripSpace")).midX])
+                            })
+                            .id("\(loop)-\(item.id)")
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                }
+                .coordinateSpace(name: "stripSpace")
+                .onPreferenceChange(CenterPrefKey.self) { newCenters in
+                    centers = newCenters
+                    let containerCenter = containerGeo.size.width / 2
+                    if !isDragging, let nearest = centers.min(by: { abs($0.value - containerCenter) < abs($1.value - containerCenter) }) {
+                        if lastSnappedKey != nearest.key {
+                            withAnimation(.easeInOut) {
+                                proxy.scrollTo(nearest.key, anchor: .center)
+                            }
+                            lastSnappedKey = nearest.key
+                            let parts = nearest.key.split(separator: "-")
+                            if let idPart = parts.last, let id = Int(idPart), let item = items.first(where: { $0.id == id }) {
+                                onSelect(item)
+                            }
+                        }
+                    }
+                }
+                .gesture(
+                    DragGesture()
+                        .updating($isDragging) { _, state, _ in
+                            state = true
+                        }
+                        .onEnded { _ in
+                            let containerCenter = containerGeo.size.width / 2
+                            if let nearest = centers.min(by: { abs($0.value - containerCenter) < abs($1.value - containerCenter) }) {
+                                let key = nearest.key
+                                lastSnappedKey = key
+                                withAnimation(.easeInOut) {
+                                    proxy.scrollTo(key, anchor: .center)
+                                }
+                                let parts = key.split(separator: "-")
+                                if let idPart = parts.last, let id = Int(idPart), let item = items.first(where: { $0.id == id }) {
+                                    onSelect(item)
+                                }
+                            }
+                        }
+                )
+                .onAppear {
+                    if let id = selectedId ?? items.first?.id {
+                        let targetId = "\(middle)-\(id)"
+                        lastSnappedKey = targetId
+                        DispatchQueue.main.async {
+                            proxy.scrollTo(targetId, anchor: .center)
+                        }
+                    }
+                }
+                .onChange(of: selectedId) { id in
+                    if let id = id {
+                        let targetId = "\(middle)-\(id)"
+                        lastSnappedKey = targetId
+                        withAnimation(.easeInOut) {
+                            proxy.scrollTo(targetId, anchor: .center)
                         }
                     }
                 }
             }
-            .padding(.horizontal, 20)
         }
     }
 }
 
 struct ShutterButton: View {
     let action: () -> Void
+    let assetName: String?
 
     var body: some View {
         Button(action: {
             action()
         }) {
             ZStack {
-                // Outer ring only (empty circle)
                 Circle()
                     .stroke(Color.white.opacity(0.9), lineWidth: 6)
                     .frame(width: 80, height: 80)
                     .shadow(color: Color.black.opacity(0.4), radius: 6, x: 0, y: 4)
+
+                if let name = assetName {
+                    SVGTemplateView(assetName: name)
+                        .frame(width: 44, height: 44)
+                        .clipShape(Circle())
+                        .allowsHitTesting(false)
+                }
             }
         }
         .accessibilityLabel("Shutter")
