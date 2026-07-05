@@ -80,10 +80,10 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
 
     @objc func capturePhoto() {
         let settings = AVCapturePhotoSettings()
-        if isFlashDisabled {
-            if photoOutput.supportedFlashModes.contains(.off) { settings.flashMode = .off }
+        if !isFlashDisabled && photoOutput.supportedFlashModes.contains(.auto) {
+            settings.flashMode = .auto
         } else {
-            if photoOutput.supportedFlashModes.contains(.auto) { settings.flashMode = .auto }
+            settings.flashMode = .off
         }
         photoOutput.capturePhoto(with: settings, delegate: self)
     }

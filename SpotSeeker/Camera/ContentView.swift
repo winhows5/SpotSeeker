@@ -108,13 +108,11 @@ struct ContentView: View {
                             .opacity(0.5)
                     }
 
-                    // Top controls: close (left) and flash toggle (center)
+                    // Top controls: search (left), flash toggle (center), settings (right)
                     VStack {
                         HStack {
                             NavigationLink(destination: FeedsView()) {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.white)
-                                    .frame(width: 36, height: 36)
+                                TopBarIcon(systemName: "magnifyingglass")
                             }
                             .simultaneousGesture(TapGesture().onEnded { print("[UI] Search pressed") })
                             Spacer()
@@ -122,18 +120,15 @@ struct ContentView: View {
                             Button {
                                 isFlashDisabled.toggle()
                             } label: {
-                                Image(systemName: isFlashDisabled ? "bolt.slash" : "bolt")
-                                    .foregroundColor(.white)
+                                TopBarIcon(systemName: isFlashDisabled ? "bolt.slash" : "bolt")
                             }
                             Spacer()
                             NavigationLink(destination: ProfileView()) {
-                                Image(systemName: "gearshape")
-                                    .foregroundColor(.white)
-                                    .frame(width: 36, height: 36)
+                                TopBarIcon(systemName: "gearshape")
                             }
                             .simultaneousGesture(TapGesture().onEnded { print("[UI] Profile pressed") })
                         }
-                        .padding(.top, 60)
+                        .padding(.top, 28)
                         .padding(.horizontal, 12)
                         Spacer()
                     }
@@ -143,43 +138,44 @@ struct ContentView: View {
                     VStack {
                         Spacer()
 
+                        // Strip and shutter share the same center line, so the selected
+                        // carousel item sits hidden behind the shutter and they read as one control
                         ZStack {
-                            // Full-width strip behind the centered shutter
                             TemplateStrip(items: templates, selectedId: selectedTemplateId) { item in
                                 selectedTemplateId = item.id
                                 overlayImage = nil
                             }
                             .frame(height: 60)
                             .frame(maxWidth: .infinity)
-                            .offset(y: -80)
 
                             // Centered shutter always on top
                             // Shutter: captures photo when tapped
                             ShutterButton(action: { self.takePicture = true }, assetName: selectedTemplateId.flatMap { id in templates.first(where: { $0.id == id })?.assetName })
                         }
+                        .offset(y: -20)
                         .padding(.horizontal, 16)
 
                         HStack {
-                            // Opens ImageSeries full-screen overlay
-                            NavigationLink(destination: ImageSeriesView()) {
-                                ZStack {
-                                    RoundedRectangle(cornerRadius: 6)
-                                        .fill(Color.white.opacity(0.15))
-                                        .frame(width: 36, height: 36)
-                                    Image(systemName: "square.grid.2x2")
-                                        .foregroundColor(.white)
-                                }
-                            }
-
                             // Picks a custom reference photo (old scene / imitation target) as overlay
                             Button {
                                 isImagePickerPresented = true
                             } label: {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 6)
-                                        .fill(Color.white.opacity(overlayImage != nil ? 0.35 : 0.15))
+                                        .fill(overlayImage != nil ? Color.white.opacity(0.35) : Color.black.opacity(0.45))
                                         .frame(width: 36, height: 36)
                                     Image(systemName: "photo.on.rectangle.angled")
+                                        .foregroundColor(.white)
+                                }
+                            }
+
+                            // Opens ImageSeries full-screen overlay
+                            NavigationLink(destination: ImageSeriesView()) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color.black.opacity(0.45))
+                                        .frame(width: 36, height: 36)
+                                    Image(systemName: "square.grid.2x2")
                                         .foregroundColor(.white)
                                 }
                             }
@@ -193,7 +189,7 @@ struct ContentView: View {
                             } label: {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 14)
-                                        .fill(Color.white.opacity(0.2))
+                                        .fill(Color.black.opacity(0.45))
                                         .frame(height: 44)
                                     HStack(spacing: 6) {
                                         Text(overlayLabel)
@@ -218,7 +214,7 @@ struct ContentView: View {
                             } label: {
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 6)
-                                        .fill(Color.white.opacity(0.15))
+                                        .fill(Color.black.opacity(0.45))
                                         .frame(width: 36, height: 36)
                                     Image(systemName: "arrow.triangle.2.circlepath")
                                         .foregroundColor(.white)
@@ -226,7 +222,7 @@ struct ContentView: View {
                             }
                         }
                         .padding(.horizontal, 16)
-                        .padding(.bottom, 24)
+                        .padding(.bottom, 0)
                     }
                 }
                 .sheet(isPresented: $isImagePickerPresented) {
@@ -346,6 +342,21 @@ struct PhotoPicker: UIViewControllerRepresentable {
                     }
                 }
             }
+        }
+    }
+}
+
+struct TopBarIcon: View {
+    let systemName: String
+
+    var body: some View {
+        ZStack {
+            Circle()
+                .fill(Color.black.opacity(0.45))
+                .frame(width: 44, height: 44)
+            Image(systemName: systemName)
+                .font(.system(size: 20, weight: .medium))
+                .foregroundColor(.white)
         }
     }
 }
