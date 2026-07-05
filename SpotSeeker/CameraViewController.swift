@@ -17,23 +17,25 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
     var photoOutput: AVCapturePhotoOutput!
     var previewLayer: AVCaptureVideoPreviewLayer!
     weak var delegate: CameraViewControllerDelegate?
+    var currentPosition: AVCaptureDevice.Position = .back
+    var isFlashDisabled: Bool = true
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupCamera()
+        setupCamera(position: currentPosition)
     }
 
-    func setupCamera() {
+    func setupCamera(position: AVCaptureDevice.Position = .back) {
         captureSession = AVCaptureSession()
         captureSession.sessionPreset = .photo
 
-        guard let backCamera = AVCaptureDevice.default(for: .video) else {
-            print("Unable to access back camera!")
+        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position) else {
+            print("Unable to access camera!")
             return
         }
 
         do {
-            let input = try AVCaptureDeviceInput(device: backCamera)
+            let input = try AVCaptureDeviceInput(device: device)
             photoOutput = AVCapturePhotoOutput()
 
             if captureSession.canAddInput(input) && captureSession.canAddOutput(photoOutput) {
@@ -44,6 +46,21 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
         } catch {
             print("Error setting up camera input: \(error)")
             return
+        }
+    }
+
+    func setCameraPosition(_ position: AVCaptureDevice.Position) {
+        guard position != currentPosition else { return }
+        currentPosition = position
+        guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: position) else { return }
+        do {
+            let newInput = try AVCaptureDeviceInput(device: device)
+            captureSession.beginConfiguration()
+            for input in captureSession.inputs { captureSession.removeInput(input) }
+            if captureSession.canAddInput(newInput) { captureSession.addInput(newInput) }
+            captureSession.commitConfiguration()
+        } catch {
+            print("Failed to switch camera: \(error)")
         }
     }
 
@@ -63,6 +80,11 @@ class CameraViewController: UIViewController, AVCapturePhotoCaptureDelegate {
 
     @objc func capturePhoto() {
         let settings = AVCapturePhotoSettings()
+        if isFlashDisabled {
+            if photoOutput.supportedFlashModes.contains(.off) { settings.flashMode = .off }
+        } else {
+            if photoOutput.supportedFlashModes.contains(.auto) { settings.flashMode = .auto }
+        }
         photoOutput.capturePhoto(with: settings, delegate: self)
     }
 

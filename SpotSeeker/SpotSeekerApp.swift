@@ -33,16 +33,23 @@ struct SpotSeekerApp: App {
 
 struct RootView: View {
     @State private var showSplash = true
+    @AppStorage("isLoggedIn") private var isLoggedIn = false
 
     var body: some View {
         ZStack {
-            MainTabView()
-                .opacity(showSplash ? 0 : 1)
-
             if showSplash {
                 SplashView()
                     .transition(.opacity)
+            } else {
+                if isLoggedIn {
+                    ContentView()
+                        .transition(.opacity)
+                } else {
+                    LoginView()
+                        .transition(.opacity)
+                }
             }
+
         }
         .onAppear {
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {

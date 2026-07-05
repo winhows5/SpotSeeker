@@ -11,6 +11,8 @@ import WebKit
 import UIKit
 import Foundation
 
+enum NavRoute: Hashable { case imageSeries }
+
 struct ContentView: View {
     @State private var capturedImage: UIImage?
     @State private var overlayImage: UIImage?
@@ -19,9 +21,13 @@ struct ContentView: View {
     @State private var showingSaveAlert = false
     @State private var saveMessage = ""
     @State private var selectedTemplateId: Int? = nil
-    @State private var templates: [TemplateItem] = TemplateItem.demoAssets
+    @State private var templates: [TemplateItem] = TemplateItem.loadAvailableTemplates()
+    @State private var useFrontCamera = false
+    @State private var isFlashDisabled = true
+    @State private var showImageSeriesGrid = false
 
     var body: some View {
+        NavigationStack {
         VStack {
             if let capturedImage = capturedImage {
                 VStack(spacing: 8) {
@@ -37,7 +43,7 @@ struct ContentView: View {
                                             .scaledToFit()
                                             .opacity(0.5)
                                     } else if let selectedId = selectedTemplateId, let item = templates.first(where: { $0.id == selectedId }) {
-                                        SVGOverlayView(assetName: item.assetName)
+                                        RasterOverlayView(assetName: item.assetName)
                                             .opacity(0.5)
                                     }
                                 }
@@ -56,12 +62,14 @@ struct ContentView: View {
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                    HStack {
+                        HStack {
+                        // Clears the captured photo to retake
                         Button("Take Another Photo") {
                             self.capturedImage = nil
                         }
                         .padding()
 
+                        // Saves the captured photo to Photos library
                         Button("Save Photo") {
                             let imageSaver = ImageSaver()
                             imageSaver.save(image: capturedImage) { result in
@@ -79,7 +87,7 @@ struct ContentView: View {
                 }
             } else {
                 ZStack {
-                    CameraView(capturedImage: $capturedImage, takePicture: $takePicture)
+                    CameraView(capturedImage: $capturedImage, takePicture: $takePicture, useFrontCamera: $useFrontCamera, isFlashDisabled: $isFlashDisabled)
                         .edgesIgnoringSafeArea(.all)
 
                     if let overlayImage = overlayImage {
@@ -88,9 +96,40 @@ struct ContentView: View {
                             .scaledToFit()
                             .opacity(0.5)
                     } else if let selectedId = selectedTemplateId, let item = templates.first(where: { $0.id == selectedId }) {
-                        SVGOverlayView(assetName: item.assetName)
+                        RasterOverlayView(assetName: item.assetName)
                             .opacity(0.5)
                     }
+
+                    // Top controls: close (left) and flash toggle (center)
+                    VStack {
+                        HStack {
+                            NavigationLink(destination: FeedsView()) {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundColor(.white)
+                                    .frame(width: 36, height: 36)
+                            }
+                            .simultaneousGesture(TapGesture().onEnded { print("[UI] Search pressed") })
+                            Spacer()
+                            // Toggles camera flash disabled/enabled
+                            Button {
+                                isFlashDisabled.toggle()
+                            } label: {
+                                Image(systemName: isFlashDisabled ? "bolt.slash" : "bolt")
+                                    .foregroundColor(.white)
+                            }
+                            Spacer()
+                            NavigationLink(destination: ProfileView()) {
+                                Image(systemName: "gearshape")
+                                    .foregroundColor(.white)
+                                    .frame(width: 36, height: 36)
+                            }
+                            .simultaneousGesture(TapGesture().onEnded { print("[UI] Profile pressed") })
+                        }
+                        .padding(.top, 60)
+                        .padding(.horizontal, 12)
+                        Spacer()
+                    }
+                    .zIndex(2)
 
                     // Bottom overlay with icon-only buttons and templates strip
                     VStack {
@@ -107,19 +146,49 @@ struct ContentView: View {
                             .offset(y: -80)
 
                             // Centered shutter always on top
+                            // Shutter: captures photo when tapped
                             ShutterButton(action: { self.takePicture = true }, assetName: selectedTemplateId.flatMap { id in templates.first(where: { $0.id == id })?.assetName })
+                        }
+                        .padding(.horizontal, 16)
 
-                            // Left overlay picker pinned to leading edge
-                            HStack {
-                                Button {
-                                    isImagePickerPresented = true
-                                } label: {
-                                    Image(systemName: "photo")
-                                        .font(.system(size: 22, weight: .regular))
+                        HStack {
+                            // Opens ImageSeries full-screen overlay
+                            NavigationLink(destination: ImageSeriesView()) {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color.white.opacity(0.15))
+                                        .frame(width: 36, height: 36)
+                                    Image(systemName: "square.grid.2x2")
                                         .foregroundColor(.white)
-                                        .padding(12)
                                 }
-                                Spacer()
+                            }
+
+                            Spacer()
+
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 14)
+                                    .fill(Color.white.opacity(0.2))
+                                    .frame(height: 44)
+                                Text(selectedTemplateId.flatMap { id in templates.first(where: { $0.id == id })?.assetName } ?? "Select Template")
+                                    .foregroundColor(.white)
+                                    .font(.system(size: 16, weight: .medium))
+                                    .padding(.horizontal, 16)
+                            }
+                            .frame(maxWidth: .infinity)
+
+                            Spacer()
+
+                            // Switches between front and back camera
+                            Button {
+                                useFrontCamera.toggle()
+                            } label: {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color.white.opacity(0.15))
+                                        .frame(width: 36, height: 36)
+                                    Image(systemName: "arrow.triangle.2.circlepath")
+                                        .foregroundColor(.white)
+                                }
                             }
                         }
                         .padding(.horizontal, 16)
@@ -129,15 +198,18 @@ struct ContentView: View {
                 .sheet(isPresented: $isImagePickerPresented) {
                     PhotoPicker(selectedImage: $overlayImage)
                 }
+
             }
         }
-        .alert(isPresented: $showingSaveAlert) {
-            Alert(title: Text("Save Status"), message: Text(saveMessage), dismissButton: .default(Text("OK")))
-        }
-        .onAppear {
-            ensureTemplatesPersistedToAppSupport()
-        }
     }
+    .alert(isPresented: $showingSaveAlert) {
+        Alert(title: Text("Save Status"), message: Text(saveMessage), dismissButton: .default(Text("OK")))
+    }
+    .onAppear {
+        ensureTemplatesPersistedToAppSupport()
+        templates = TemplateItem.loadAvailableTemplates()
+    }
+}
 
     // Persist bundled template assets into the app's internal storage (Library/Application Support)
     // This avoids exposing them directly to the user via Files while keeping them available for runtime use.
@@ -154,31 +226,34 @@ struct ContentView: View {
             return
         }
 
-        // Copy each asset into Application Support if it doesn't exist yet
-        for item in TemplateItem.demoAssets {
-            let targetURL = templatesDir.appendingPathComponent("\(item.assetName).svg")
-            if fm.fileExists(atPath: targetURL.path) {
-                continue
+        // Copy or update raster template assets into Application Support
+        let exts = ["jpg","jpeg","png","heic"]
+        var bundleURLs: [URL] = []
+        for ext in exts {
+            if let urls = Bundle.main.urls(forResourcesWithExtension: ext, subdirectory: "ImageSeries/DemoSeries") {
+                bundleURLs.append(contentsOf: urls)
             }
-            // Prefer raw SVG from bundle under ImageSeries/DemoSeries
-            if let rawURL = Bundle.main.url(forResource: item.assetName, withExtension: "svg", subdirectory: "ImageSeries/DemoSeries") {
-                do {
-                    let data = try Data(contentsOf: rawURL)
-                    try data.write(to: targetURL, options: .atomic)
-                    print("[TemplatePersist] Stored \(item.assetName) from bundle at \(targetURL.path)")
-                } catch {
-                    print("[TemplatePersist] Failed to persist \(item.assetName) from bundle: \(error)")
+            if let urls = Bundle.main.urls(forResourcesWithExtension: ext, subdirectory: nil) {
+                bundleURLs.append(contentsOf: urls)
+            }
+        }
+        for rawURL in bundleURLs {
+            let base = rawURL.deletingPathExtension().lastPathComponent
+            let targetURL = templatesDir.appendingPathComponent("\(base).\(rawURL.pathExtension)")
+            do {
+                let bundleData = try Data(contentsOf: rawURL)
+                if fm.fileExists(atPath: targetURL.path) {
+                    if let existingData = try? Data(contentsOf: targetURL), existingData == bundleData {
+                    } else {
+                        try bundleData.write(to: targetURL, options: .atomic)
+                        print("[TemplatePersist] Updated \(base) from bundle at \(targetURL.path)")
+                    }
+                } else {
+                    try bundleData.write(to: targetURL, options: .atomic)
+                    print("[TemplatePersist] Stored \(base) from bundle at \(targetURL.path)")
                 }
-            } else if let dataAsset = NSDataAsset(name: item.assetName) {
-                // Fallback to asset catalog (Data asset) if raw bundle file is not present
-                do {
-                    try dataAsset.data.write(to: targetURL, options: .atomic)
-                    print("[TemplatePersist] Stored \(item.assetName) from asset catalog at \(targetURL.path)")
-                } catch {
-                    print("[TemplatePersist] Failed to persist \(item.assetName) from asset catalog: \(error)")
-                }
-            } else {
-                print("[TemplatePersist] Missing bundled resource for \(item.assetName)")
+            } catch {
+                print("[TemplatePersist] Failed to persist \(base) from bundle: \(error)")
             }
         }
     }
@@ -239,265 +314,6 @@ struct PhotoPicker: UIViewControllerRepresentable {
     }
 }
 
-// Templates data and strip UI
-struct TemplateItem: Identifiable {
-    let id: Int
-    let name: String
-    let assetName: String
-
-    static let demoAssets: [TemplateItem] = [
-        TemplateItem(id: 0, name: "camera", assetName: "camera"),
-        TemplateItem(id: 1, name: "photo", assetName: "photo"),
-        TemplateItem(id: 2, name: "person", assetName: "person"),
-        TemplateItem(id: 3, name: "heart", assetName: "heart"),
-        TemplateItem(id: 4, name: "star", assetName: "star"),
-        TemplateItem(id: 5, name: "bolt", assetName: "bolt"),
-        TemplateItem(id: 6, name: "bell", assetName: "bell"),
-        TemplateItem(id: 7, name: "leaf", assetName: "leaf"),
-    ]
-}
-
-struct SVGOverlayView: UIViewRepresentable {
-    let assetName: String
-
-    private func html(for svgString: String) -> String {
-        return """
-<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"initial-scale=1, maximum-scale=1\"><style>
-html, body { margin:0; padding:0; background: transparent; }
-.container { display:flex; align-items:center; justify-content:center; height:100vh; width:100vw; }
-svg { width: 80vw; height: auto; }
-</style></head><body>
-<div class=\"container\">\(svgString)</div>
-</body></html>
-"""
-    }
-
-    private func persistedSVGString(for assetName: String) -> String? {
-        let fm = FileManager.default
-        guard let appSupportURL = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return nil }
-        let svgURL = appSupportURL.appendingPathComponent("ImageSeries/DemoSeries/\(assetName).svg")
-        guard let data = try? Data(contentsOf: svgURL) else { return nil }
-        return String(data: data, encoding: .utf8)
-    }
-
-    private func bundledSVGString(for assetName: String) -> String? {
-        if let rawURL = Bundle.main.url(forResource: assetName, withExtension: "svg", subdirectory: "ImageSeries/DemoSeries"),
-           let data = try? Data(contentsOf: rawURL),
-           let s = String(data: data, encoding: .utf8) {
-            return s
-        }
-        if let dataAsset = NSDataAsset(name: assetName), let s = String(data: dataAsset.data, encoding: .utf8) {
-            return s
-        }
-        return nil
-    }
-
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
-        webView.scrollView.isScrollEnabled = false
-        webView.scrollView.bounces = false
-        webView.scrollView.contentInsetAdjustmentBehavior = .never
-        webView.isUserInteractionEnabled = false
-        let svgString: String?
-        if let persisted = persistedSVGString(for: assetName) {
-            svgString = persisted
-        } else {
-            svgString = bundledSVGString(for: assetName)
-        }
-        if let s = svgString {
-            webView.loadHTMLString(html(for: s), baseURL: nil)
-        }
-        return webView
-    }
-
-    func updateUIView(_ uiView: WKWebView, context: Context) {
-        let svgString: String?
-        if let persisted = persistedSVGString(for: assetName) {
-            svgString = persisted
-        } else {
-            svgString = bundledSVGString(for: assetName)
-        }
-        if let s = svgString {
-            uiView.loadHTMLString(html(for: s), baseURL: nil)
-        }
-    }
-}
-
-struct SVGTemplateView: UIViewRepresentable {
-    let assetName: String
-
-    private func html(for svgString: String) -> String {
-        return """
-<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"initial-scale=1, maximum-scale=1\"><style>
-html, body { margin:0; padding:0; background: transparent; }
-svg { width: 52px; height: 52px; }
-</style></head><body>
-\(svgString)
-</body></html>
-"""
-    }
-
-    private func persistedSVGString(for assetName: String) -> String? {
-        let fm = FileManager.default
-        guard let appSupportURL = fm.urls(for: .applicationSupportDirectory, in: .userDomainMask).first else { return nil }
-        let svgURL = appSupportURL.appendingPathComponent("ImageSeries/DemoSeries/\(assetName).svg")
-        guard let data = try? Data(contentsOf: svgURL) else { return nil }
-        return String(data: data, encoding: .utf8)
-    }
-
-    private func bundledSVGString(for assetName: String) -> String? {
-        if let rawURL = Bundle.main.url(forResource: assetName, withExtension: "svg", subdirectory: "ImageSeries/DemoSeries"),
-           let data = try? Data(contentsOf: rawURL),
-           let s = String(data: data, encoding: .utf8) {
-            return s
-        }
-        if let dataAsset = NSDataAsset(name: assetName), let s = String(data: dataAsset.data, encoding: .utf8) {
-            return s
-        }
-        return nil
-    }
-
-    func makeUIView(context: Context) -> WKWebView {
-        let webView = WKWebView()
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
-        webView.scrollView.isScrollEnabled = false
-        webView.scrollView.bounces = false
-        webView.scrollView.contentInsetAdjustmentBehavior = .never
-        webView.isUserInteractionEnabled = false
-        let svgString: String?
-        if let persisted = persistedSVGString(for: assetName) {
-            svgString = persisted
-        } else {
-            svgString = bundledSVGString(for: assetName)
-        }
-        if let s = svgString {
-            webView.loadHTMLString(html(for: s), baseURL: nil)
-        }
-        return webView
-    }
-
-    func updateUIView(_ uiView: WKWebView, context: Context) {
-        let svgString: String?
-        if let persisted = persistedSVGString(for: assetName) {
-            svgString = persisted
-        } else {
-            svgString = bundledSVGString(for: assetName)
-        }
-        if let s = svgString {
-            uiView.loadHTMLString(html(for: s), baseURL: nil)
-        }
-    }
-}
-
-struct TemplateStrip: View {
-    let items: [TemplateItem]
-    let selectedId: Int?
-    let onSelect: (TemplateItem) -> Void
-    struct CenterPrefKey: PreferenceKey {
-        static var defaultValue: [String: CGFloat] = [:]
-        static func reduce(value: inout [String: CGFloat], nextValue: () -> [String: CGFloat]) {
-            value.merge(nextValue(), uniquingKeysWith: { $1 })
-        }
-    }
-    @State private var centers: [String: CGFloat] = [:]
-    @GestureState private var isDragging = false
-    @State private var lastSnappedKey: String? = nil
-
-    var body: some View {
-        ScrollViewReader { proxy in
-            let loops = 5
-            let middle = loops / 2
-            let repeatedCount = loops * items.count
-            GeometryReader { containerGeo in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 40) {
-                        ForEach(0..<repeatedCount, id: \.self) { idx in
-                            let loop = idx / items.count
-                            let item = items[idx % items.count]
-                            Button {
-                                onSelect(item)
-                                withAnimation(.easeInOut) {
-                                    let targetId = "\(middle)-\(item.id)"
-                                    proxy.scrollTo(targetId, anchor: .center)
-                                }
-                            } label: {
-                                ZStack {
-                                    SVGTemplateView(assetName: item.assetName)
-                                        .frame(width: 60, height: 60)
-                                        .allowsHitTesting(false)
-                                }
-                            }
-                            .background(GeometryReader { gp in
-                                Color.clear.preference(key: CenterPrefKey.self, value: ["\(loop)-\(item.id)": gp.frame(in: .named("stripSpace")).midX])
-                            })
-                            .id("\(loop)-\(item.id)")
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                }
-                .coordinateSpace(name: "stripSpace")
-                .onPreferenceChange(CenterPrefKey.self) { newCenters in
-                    centers = newCenters
-                    let containerCenter = containerGeo.size.width / 2
-                    if !isDragging, let nearest = centers.min(by: { abs($0.value - containerCenter) < abs($1.value - containerCenter) }) {
-                        if lastSnappedKey != nearest.key {
-                            withAnimation(.easeInOut) {
-                                proxy.scrollTo(nearest.key, anchor: .center)
-                            }
-                            lastSnappedKey = nearest.key
-                            let parts = nearest.key.split(separator: "-")
-                            if let idPart = parts.last, let id = Int(idPart), let item = items.first(where: { $0.id == id }) {
-                                onSelect(item)
-                            }
-                        }
-                    }
-                }
-                .gesture(
-                    DragGesture()
-                        .updating($isDragging) { _, state, _ in
-                            state = true
-                        }
-                        .onEnded { _ in
-                            let containerCenter = containerGeo.size.width / 2
-                            if let nearest = centers.min(by: { abs($0.value - containerCenter) < abs($1.value - containerCenter) }) {
-                                let key = nearest.key
-                                lastSnappedKey = key
-                                withAnimation(.easeInOut) {
-                                    proxy.scrollTo(key, anchor: .center)
-                                }
-                                let parts = key.split(separator: "-")
-                                if let idPart = parts.last, let id = Int(idPart), let item = items.first(where: { $0.id == id }) {
-                                    onSelect(item)
-                                }
-                            }
-                        }
-                )
-                .onAppear {
-                    if let id = selectedId ?? items.first?.id {
-                        let targetId = "\(middle)-\(id)"
-                        lastSnappedKey = targetId
-                        DispatchQueue.main.async {
-                            proxy.scrollTo(targetId, anchor: .center)
-                        }
-                    }
-                }
-                .onChange(of: selectedId) { id in
-                    if let id = id {
-                        let targetId = "\(middle)-\(id)"
-                        lastSnappedKey = targetId
-                        withAnimation(.easeInOut) {
-                            proxy.scrollTo(targetId, anchor: .center)
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
 struct ShutterButton: View {
     let action: () -> Void
     let assetName: String?
@@ -507,21 +323,25 @@ struct ShutterButton: View {
             action()
         }) {
             ZStack {
-                Circle()
-                    .stroke(Color.white.opacity(0.9), lineWidth: 6)
-                    .frame(width: 80, height: 80)
-                    .shadow(color: Color.black.opacity(0.4), radius: 6, x: 0, y: 4)
-
                 if let name = assetName {
-                    SVGTemplateView(assetName: name)
-                        .frame(width: 44, height: 44)
+                    RasterTemplateView(assetName: name)
+                        .scaledToFill()
+                        .frame(width: 80, height: 80)
                         .clipShape(Circle())
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white.opacity(0.9), lineWidth: 6)
+                                .shadow(color: Color.black.opacity(0.4), radius: 6, x: 0, y: 4)
+                        )
                         .allowsHitTesting(false)
+                } else {
+                    Circle()
+                        .stroke(Color.white.opacity(0.9), lineWidth: 6)
+                        .frame(width: 80, height: 80)
+                        .shadow(color: Color.black.opacity(0.4), radius: 6, x: 0, y: 4)
                 }
             }
         }
         .accessibilityLabel("Shutter")
     }
 }
-
-

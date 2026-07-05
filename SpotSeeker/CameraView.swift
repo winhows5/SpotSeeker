@@ -11,6 +11,8 @@ import AVFoundation
 struct CameraView: UIViewControllerRepresentable {
     @Binding var capturedImage: UIImage?
     @Binding var takePicture: Bool
+    @Binding var useFrontCamera: Bool
+    @Binding var isFlashDisabled: Bool
 
     func makeUIViewController(context: Context) -> CameraViewController {
         let cameraViewController = CameraViewController()
@@ -19,6 +21,8 @@ struct CameraView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_ uiViewController: CameraViewController, context: Context) {
+        uiViewController.setCameraPosition(useFrontCamera ? .front : .back)
+        uiViewController.isFlashDisabled = isFlashDisabled
         if self.takePicture {
             uiViewController.capturePhoto()
             DispatchQueue.main.async {
