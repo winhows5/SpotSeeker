@@ -26,6 +26,14 @@ struct ContentView: View {
     @State private var isFlashDisabled = true
     @State private var showImageSeriesGrid = false
 
+    private var overlayLabel: String {
+        if overlayImage != nil { return "Custom Photo" }
+        if let id = selectedTemplateId, let item = templates.first(where: { $0.id == id }) {
+            return item.assetName
+        }
+        return "Select Template"
+    }
+
     var body: some View {
         NavigationStack {
         VStack {
@@ -163,16 +171,42 @@ struct ContentView: View {
                                 }
                             }
 
+                            // Picks a custom reference photo (old scene / imitation target) as overlay
+                            Button {
+                                isImagePickerPresented = true
+                            } label: {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 6)
+                                        .fill(Color.white.opacity(overlayImage != nil ? 0.35 : 0.15))
+                                        .frame(width: 36, height: 36)
+                                    Image(systemName: "photo.on.rectangle.angled")
+                                        .foregroundColor(.white)
+                                }
+                            }
+                            .padding(.leading, 8)
+
                             Spacer()
 
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 14)
-                                    .fill(Color.white.opacity(0.2))
-                                    .frame(height: 44)
-                                Text(selectedTemplateId.flatMap { id in templates.first(where: { $0.id == id })?.assetName } ?? "Select Template")
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 16, weight: .medium))
+                            // Shows active reference; tap clears a custom overlay photo
+                            Button {
+                                if overlayImage != nil { overlayImage = nil }
+                            } label: {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(Color.white.opacity(0.2))
+                                        .frame(height: 44)
+                                    HStack(spacing: 6) {
+                                        Text(overlayLabel)
+                                            .foregroundColor(.white)
+                                            .font(.system(size: 16, weight: .medium))
+                                        if overlayImage != nil {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .foregroundColor(.white.opacity(0.8))
+                                                .font(.system(size: 14))
+                                        }
+                                    }
                                     .padding(.horizontal, 16)
+                                }
                             }
                             .frame(maxWidth: .infinity)
 
@@ -307,7 +341,9 @@ struct PhotoPicker: UIViewControllerRepresentable {
 
             if provider.canLoadObject(ofClass: UIImage.self) {
                 provider.loadObject(ofClass: UIImage.self) { image, _ in
-                    self.parent.selectedImage = image as? UIImage
+                    DispatchQueue.main.async {
+                        self.parent.selectedImage = image as? UIImage
+                    }
                 }
             }
         }
