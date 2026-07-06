@@ -103,6 +103,45 @@ struct RasterTemplateView: View {
     }
 }
 
+// One carousel circle. Reads its own position every frame while the strip
+// scrolls and derives scale/spread/opacity locally, so the visuals track the
+// finger directly instead of waiting for a preference -> state -> re-render
+// round-trip (which lags and drops intermediate frames on fast flicks).
+private struct StripItem: View {
+    let assetName: String
+    let containerCenter: CGFloat
+    let halfWidth: CGFloat
+    let spreadFactor: CGFloat
+
+    var body: some View {
+        GeometryReader { gp in
+            let centerX = gp.frame(in: .global).midX
+            let signedNorm = max(min((centerX - containerCenter) / halfWidth, 1), -1)
+            let normalized = abs(signedNorm)
+            let scale = 1.0 - 0.5 * normalized
+            let spread = signedNorm * (1 - normalized) * spreadFactor
+            // Fade out approaching the center so the item vanishes behind the
+            // shutter instead of peeking around it: invisible at dead center,
+            // fully opaque beyond a quarter of the half-width
+            let itemOpacity = min(normalized / 0.25, 1)
+            RasterTemplateView(assetName: assetName)
+                .scaledToFill()
+                .frame(width: 52, height: 52)
+                .clipShape(Circle())
+                .overlay(
+                    Circle()
+                        .stroke(Color.white.opacity(0.9), lineWidth: 1)
+                )
+                .scaleEffect(scale)
+                .offset(x: spread)
+                .opacity(itemOpacity)
+                .frame(width: gp.size.width, height: gp.size.height)
+        }
+        .frame(width: 52, height: 60)
+        .allowsHitTesting(false)
+    }
+}
+
 struct TemplateStrip: View {
     let items: [TemplateItem]
     let selectedId: Int?
@@ -117,6 +156,21 @@ struct TemplateStrip: View {
     @State private var centers: [String: CGFloat] = [:]
     @GestureState private var isDragging = false
     @State private var lastSnappedKey: String? = nil
+    @State private var pendingSnap: DispatchWorkItem? = nil
+
+    // Snap only after scrolling has settled: snapping mid-gesture issues animated
+    // scrolls that fight the user's drag and the natural deceleration.
+    private func scheduleSnap(to key: String, proxy: ScrollViewProxy) {
+        pendingSnap?.cancel()
+        let work = DispatchWorkItem {
+            guard !isDragging else { return }
+            withAnimation(.easeInOut) {
+                proxy.scrollTo(key, anchor: .center)
+            }
+        }
+        pendingSnap = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.15, execute: work)
+    }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -138,35 +192,12 @@ struct TemplateStrip: View {
                     HStack(spacing: computedSpacing) {
                         ForEach(items) { item in
                             let key = "\(item.id)"
-                            let containerCenter = containerGeo.frame(in: .global).midX
-                            let centerX = centers[key] ?? containerCenter
-                            let halfWidth = max(containerGeo.size.width / 2, 1)
-                            let signedNorm = max(min((centerX - containerCenter) / halfWidth, 1), -1)
-                            let normalized = abs(signedNorm)
-                            let scale = 1.0 - 0.5 * normalized
-                            let spread = signedNorm * (1 - normalized) * spreadFactor
-                            // Fade out approaching the center so the item vanishes behind the
-                            // shutter instead of peeking around it: invisible at dead center,
-                            // fully opaque beyond a quarter of the half-width
-                            let itemOpacity = min(normalized / 0.25, 1)
-                            ZStack {
-                                RasterTemplateView(assetName: item.assetName)
-                                    .scaledToFill()
-                                    .frame(width: 52, height: 52)
-                                    .clipShape(Circle())
-                                    .overlay(
-                                        Circle()
-                                            .stroke(Color.white.opacity(0.9), lineWidth: 1)
-                                    )
-                                    .padding(.vertical, 4)
-                                    .allowsHitTesting(false)
-                            }
-                            .scaleEffect(scale)
-                            .animation(.easeOut(duration: 0.15), value: scale)
-                            .offset(x: spread)
-                            .animation(.easeOut(duration: 0.15), value: spread)
-                            .opacity(itemOpacity)
-                            .animation(.easeOut(duration: 0.15), value: itemOpacity)
+                            StripItem(
+                                assetName: item.assetName,
+                                containerCenter: containerGeo.frame(in: .global).midX,
+                                halfWidth: max(containerGeo.size.width / 2, 1),
+                                spreadFactor: spreadFactor
+                            )
                             .background(GeometryReader { gp in
                                 Color.clear.preference(key: CenterPrefKey.self, value: [key: gp.frame(in: .global).midX])
                             })
@@ -179,32 +210,23 @@ struct TemplateStrip: View {
                 .onPreferenceChange(CenterPrefKey.self) { newCenters in
                     centers = newCenters
                     let containerCenter = containerGeo.frame(in: .global).midX
-                    if !isDragging, let nearest = centers.min(by: { abs($0.value - containerCenter) < abs($1.value - containerCenter) }) {
-                        if lastSnappedKey != nearest.key {
-                            withAnimation(.easeInOut) {
-                                proxy.scrollTo(nearest.key, anchor: .center)
-                            }
-                            lastSnappedKey = nearest.key
-                            if let id = Int(nearest.key), let item = items.first(where: { $0.id == id }) {
-                                onSelect(item)
-                            }
+                    guard let nearest = centers.min(by: { abs($0.value - containerCenter) < abs($1.value - containerCenter) }) else { return }
+                    // Update the selection live so the shutter thumbnail follows the scroll
+                    if lastSnappedKey != nearest.key {
+                        lastSnappedKey = nearest.key
+                        if let id = Int(nearest.key), let item = items.first(where: { $0.id == id }) {
+                            onSelect(item)
                         }
                     }
+                    scheduleSnap(to: nearest.key, proxy: proxy)
                 }
-                .gesture(
+                .simultaneousGesture(
                     DragGesture()
                         .updating($isDragging) { _, state, _ in state = true }
                         .onEnded { _ in
                             let containerCenter = containerGeo.frame(in: .global).midX
                             if let nearest = centers.min(by: { abs($0.value - containerCenter) < abs($1.value - containerCenter) }) {
-                                let key = nearest.key
-                                lastSnappedKey = key
-                                withAnimation(.easeInOut) {
-                                    proxy.scrollTo(key, anchor: .center)
-                                }
-                                if let id = Int(key), let item = items.first(where: { $0.id == id }) {
-                                    onSelect(item)
-                                }
+                                scheduleSnap(to: nearest.key, proxy: proxy)
                             }
                         }
                 )
